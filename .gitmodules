@@ -1,0 +1,12 @@
+[submodule "ext/oboe"]
+	path = ext/oboe
+	url = https://github.com/google/oboe.git
+[submodule "ext/cxxcurses"]
+	path = ext/cxxcurses
+	url = https://github.com/hjaremko/cxxcurses.git
+[submodule "ext/SQLiteCpp"]
+	path = ext/SQLiteCpp
+	url = https://github.com/SRombauts/SQLiteCpp.git
+[submodule "ext/PolyM"]
+	path = ext/PolyM
+	url = https://github.com/khuttun/PolyM.git
