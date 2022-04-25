@@ -7,7 +7,7 @@
 namespace cursejay {
   class obj {
     protected:
-      conf& conf;
+      cursejay::conf& conf;
       PolyM::Queue& q;
 
     public:
