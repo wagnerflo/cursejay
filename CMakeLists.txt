@@ -2,6 +2,7 @@ cmake_minimum_required ( VERSION 3.4.1 )
 project ( cursejay )
 
 add_executable ( cursejay
+  # src/mat.cc
   src/main.cc
   src/conf.cc
   src/db.cc
@@ -12,13 +13,11 @@ add_executable ( cursejay
 target_compile_features( cursejay PUBLIC cxx_std_17 )
 target_compile_options( cursejay PRIVATE -Wall -Wextra -Wconversion  )
 target_include_directories ( cursejay PUBLIC
-  ext/oboe/include
   ext/cxxcurses/include
+  ext/miniaudio
   ext/PolyM/include
 )
 target_link_libraries ( cursejay
-  log
-  oboe
   ncurses
   SQLiteCpp
   sqlite3
@@ -26,6 +25,7 @@ target_link_libraries ( cursejay
   dl
   polym
   tag
+  m
 )
 
 option ( SQLITECPP_INTERNAL_SQLITE "" OFF )

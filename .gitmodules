@@ -1,6 +1,3 @@
-[submodule "ext/oboe"]
-	path = ext/oboe
-	url = https://github.com/google/oboe.git
 [submodule "ext/cxxcurses"]
 	path = ext/cxxcurses
 	url = https://github.com/hjaremko/cxxcurses.git
@@ -10,3 +7,6 @@
 [submodule "ext/PolyM"]
 	path = ext/PolyM
 	url = https://github.com/khuttun/PolyM.git
+[submodule "ext/miniaudio"]
+	path = ext/miniaudio
+	url = https://github.com/mackron/miniaudio.git
