@@ -1,4 +1,4 @@
-#include "channel_merge.hh"
+#include "channel_map.hh"
 #include "player.hh"
 
 #include <fmt/core.h>
@@ -71,14 +71,20 @@ void player::init(const std::string& device_name) {
     ));
   }
 
+  // start building the node graph: endpoint
   auto ng_conf = ma_node_graph_config_init(channels);
 
   if (ma_node_graph_init(&ng_conf, NULL, &graph) != MA_SUCCESS) {
     throw std::runtime_error("Failed to initialize node graph.");
   }
 
+  // next node maps two inputs to channels of the single endpoint output
+  channel_map_node channel_map(graph, channels);
+  channel_map.attach_output_bus(ma_node_graph_get_endpoint(&graph), 0, 0);
+
+  // ...
   auto dec_conf = ma_decoder_config_init(
-    dev_config.playback.format, channels, dev_config.sampleRate
+    dev_config.playback.format, 1, dev_config.sampleRate
   );
 
   ma_decoder decoder;
@@ -93,15 +99,14 @@ void player::init(const std::string& device_name) {
   ma_data_source_node data_src_node;
   ma_data_source_node_init(&graph, &data_src_conf, NULL, &data_src_node);
 
-  ma_node_attach_output_bus(&data_src_node, 0, ma_node_graph_get_endpoint(&graph), 0);
+  // ma_node_attach_output_bus(&data_src_node, 0, channel_map.node_base, 0);
+  // channel_map.attach_input_bus(&data_src_node, 0, 0);
+  channel_map.attach_input_bus(&data_src_node, 0, 1);
 
   ma_device_start(&dev);
 
   printf("Press Enter to quit...\n");
   getchar();
-
-  // ma_node_graph node_graph;
-  // channel_merge_node channel_merge(node_graph);
 
 }
 

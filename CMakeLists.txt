@@ -6,14 +6,14 @@ pkg_search_module(TAGLIB REQUIRED taglib)
 pkg_search_module(FMT REQUIRED fmt)
 
 add_executable ( cursejay
-  src/main.cc
+  src/channel_map.cc
   src/conf.cc
   src/db.cc
-  src/ui.cc
+  src/main.cc
+  src/miniaudio.cc
   src/obj.cc
   src/player.cc
-  src/miniaudio.cc
-  src/channel_merge.cc
+  src/ui.cc
 )
 
 set_source_files_properties(
@@ -22,7 +22,7 @@ set_source_files_properties(
   -Wno-conversion
 )
 
-target_compile_features( cursejay PRIVATE cxx_std_17 )
+target_compile_features( cursejay PRIVATE cxx_std_20 )
 target_compile_options( cursejay PRIVATE
   -Wall -Wextra -Wconversion
   ${FMT_CFLAGS_OTHER}

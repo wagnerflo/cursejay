@@ -18,6 +18,16 @@ namespace cursejay {
           }
       };
 
+      void attach_output_bus(ma_node* other, ma_uint32 out_idx, ma_uint32 inp_idx) {
+        if (ma_node_attach_output_bus(&node_base, out_idx, other, inp_idx) != MA_SUCCESS)
+          throw std::runtime_error("node output bus attach error");
+      }
+
+      void attach_input_bus(ma_node* other, ma_uint32 out_idx, ma_uint32 inp_idx) {
+        if (ma_node_attach_output_bus(other, out_idx, &node_base, inp_idx) != MA_SUCCESS)
+          throw std::runtime_error("node input bus attach error");
+      }
+
     protected:
       struct {
           ma_node_base base;
