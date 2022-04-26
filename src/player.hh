@@ -9,11 +9,14 @@
 
 namespace cursejay {
   class player : public obj {
+    friend class player_adaptor;
+
     protected:
       ma_context ctx;
       ma_node_graph graph;
 
-      std::list<::ma_device_info> device_infos();
+      std::list<ma_device_info> device_infos();
+      void data_callback(ma_device*, void*, const void*, ma_uint32);
 
     public:
       player(class conf&, class broker&);
@@ -23,8 +26,6 @@ namespace cursejay {
 
       void init(const std::string&);
       void run();
-
-      void data_callback(void*, const void*, ma_uint32);
   };
 }
 

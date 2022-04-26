@@ -6,26 +6,30 @@
 
 using namespace cursejay;
 
-static void _data_callback(ma_device* dev, void* out, const void* in, ma_uint32 cnt) {
-  static_cast<cursejay::player*>(dev->pUserData)->data_callback(out, in, cnt);
+namespace cursejay {
+  class player_adaptor {
+    public:
+      static void callback(ma_device* dev, void* out, const void* in, ma_uint32 cnt) {
+        static_cast<player*>(dev->pUserData)->data_callback(dev, out, in, cnt);
+      }
+  };
 }
 
-void player::data_callback(void* out, const void* in, ma_uint32 cnt) {
+void player::data_callback(ma_device*, void* out, const void*, ma_uint32 cnt) {
   ma_node_graph_read_pcm_frames(&graph, out, cnt, NULL);
-  (void) in;
 }
-cursejay::player::player(cursejay::conf& c, cursejay::broker& b)
-  : cursejay::obj(c, b) {
+
+player::player(class conf& c, class broker& b) : obj(c, b) {
   if (ma_context_init(NULL, 0, NULL, &ctx) != MA_SUCCESS) {
     throw std::runtime_error("");
   }
 }
 
-cursejay::player::~player() {
+player::~player() {
   ma_context_uninit(&ctx);
 }
 
-std::list<std::string> cursejay::player::list_devices() {
+std::list<std::string> player::list_devices() {
   std::list<std::string> devices;
   for (auto& info : device_infos()) {
     devices.push_back(std::string(info.name));
@@ -33,7 +37,7 @@ std::list<std::string> cursejay::player::list_devices() {
   return devices;
 }
 
-void cursejay::player::init(const std::string& device_name) {
+void player::init(const std::string& device_name) {
   auto infos = device_infos();
   auto dev_config = ma_device_config_init(ma_device_type_playback);
 
@@ -50,7 +54,7 @@ void cursejay::player::init(const std::string& device_name) {
 
   dev_config.playback.format = ma_format_f32;
   dev_config.sampleRate = 48000;
-  dev_config.dataCallback = _data_callback;
+  dev_config.dataCallback = &player_adaptor::callback;
   dev_config.pUserData = this;
 
   ma_device dev;
@@ -97,11 +101,11 @@ void cursejay::player::init(const std::string& device_name) {
   getchar();
 
   // ma_node_graph node_graph;
-  // cursejay::channel_merge_node channel_merge(node_graph);
+  // channel_merge_node channel_merge(node_graph);
 
 }
 
-void cursejay::player::run() {
+void player::run() {
   // std::cout << "PLAYER RUNNING" << std::endl;
 
   // ma_sound sound;
@@ -120,7 +124,7 @@ void cursejay::player::run() {
   // ma_sound_uninit(&sound);
 }
 
-std::list<ma_device_info> cursejay::player::device_infos() {
+std::list<ma_device_info> player::device_infos() {
   ma_device_info* infos;
   ma_uint32 cnt;
   if (ma_context_get_devices(&ctx, &infos, &cnt, NULL, NULL) != MA_SUCCESS) {
