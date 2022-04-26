@@ -1,18 +1,18 @@
 #ifndef CURSEJAY_OBJ_HH
 #define CURSEJAY_OBJ_HH
 
+#include "broker.hh"
 #include "conf.hh"
-#include <polym/Queue.hpp>
 
 namespace cursejay {
   class obj {
     protected:
       cursejay::conf& conf;
-      PolyM::Queue& q;
+      cursejay::broker& broker;
 
     public:
-      obj(class conf&, class PolyM::Queue&);
-      virtual void start() = 0;
+      obj(class conf&, class broker&);
+      virtual void run() = 0;
   };
 }
 

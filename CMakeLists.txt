@@ -3,6 +3,7 @@ project ( cursejay )
 
 find_package(PkgConfig REQUIRED)
 pkg_search_module(TAGLIB REQUIRED taglib)
+pkg_search_module(FMT REQUIRED fmt)
 
 add_executable ( cursejay
   src/main.cc
@@ -12,6 +13,7 @@ add_executable ( cursejay
   src/obj.cc
   src/player.cc
   src/miniaudio.cc
+  src/channel_merge.cc
 )
 
 set_source_files_properties(
@@ -23,12 +25,14 @@ set_source_files_properties(
 target_compile_features( cursejay PRIVATE cxx_std_17 )
 target_compile_options( cursejay PRIVATE
   -Wall -Wextra -Wconversion
+  ${FMT_CFLAGS_OTHER}
   ${TAGLIB_CFLAGS_OTHER}
 )
 target_include_directories ( cursejay PRIVATE
   ext/cxxcurses/include
   ext/miniaudio
   ext/PolyM/include
+  ${FMT_INCLUDE_DIRS}
   ${TAGLIB_INCLUDE_DIRS}
 )
 target_link_libraries ( cursejay
@@ -39,6 +43,7 @@ target_link_libraries ( cursejay
   SQLiteCpp
   sqlite3
   m
+  ${FMT_LIBRARIES}
   ${TAGLIB_LIBRARIES}
 )
 

@@ -1,37 +1,130 @@
+#include "channel_merge.hh"
 #include "player.hh"
-#include <miniaudio.h>
 
-void cursejay::player::list_devices() {
-  ma_result result;
-  ma_context context;
-  ma_device_info* pPlaybackDeviceInfos;
-  ma_uint32 playbackDeviceCount;
-  ma_device_info* pCaptureDeviceInfos;
-  ma_uint32 captureDeviceCount;
-  ma_uint32 iDevice;
+#include <fmt/core.h>
+#include <stdexcept>
 
-  if (ma_context_init(NULL, 0, NULL, &context) != MA_SUCCESS) {
-    printf("Failed to initialize context.\n");
-    return;
+using namespace cursejay;
+
+static void _data_callback(ma_device* dev, void* out, const void* in, ma_uint32 cnt) {
+  static_cast<cursejay::player*>(dev->pUserData)->data_callback(out, in, cnt);
+}
+
+void player::data_callback(void* out, const void* in, ma_uint32 cnt) {
+  ma_node_graph_read_pcm_frames(&graph, out, cnt, NULL);
+  (void) in;
+}
+cursejay::player::player(cursejay::conf& c, cursejay::broker& b)
+  : cursejay::obj(c, b) {
+  if (ma_context_init(NULL, 0, NULL, &ctx) != MA_SUCCESS) {
+    throw std::runtime_error("");
+  }
+}
+
+cursejay::player::~player() {
+  ma_context_uninit(&ctx);
+}
+
+std::list<std::string> cursejay::player::list_devices() {
+  std::list<std::string> devices;
+  for (auto& info : device_infos()) {
+    devices.push_back(std::string(info.name));
+  }
+  return devices;
+}
+
+void cursejay::player::init(const std::string& device_name) {
+  auto infos = device_infos();
+  auto dev_config = ma_device_config_init(ma_device_type_playback);
+
+  for (auto& info : infos) {
+    if (device_name == info.name) {
+      dev_config.playback.pDeviceID = &info.id;
+      break;
+    }
   }
 
-  result = ma_context_get_devices(&context, &pPlaybackDeviceInfos, &playbackDeviceCount, &pCaptureDeviceInfos, &captureDeviceCount);
-  if (result != MA_SUCCESS) {
-    printf("Failed to retrieve device information.\n");
-    return;
+  if (dev_config.playback.pDeviceID == NULL) {
+    throw std::runtime_error("Device not found");
   }
 
-  printf("Playback Devices\n");
-  for (iDevice = 0; iDevice < playbackDeviceCount; ++iDevice) {
-    printf("    %u: %s\n", iDevice, pPlaybackDeviceInfos[iDevice].name);
+  dev_config.playback.format = ma_format_f32;
+  dev_config.sampleRate = 48000;
+  dev_config.dataCallback = _data_callback;
+  dev_config.pUserData = this;
+
+  ma_device dev;
+  if (ma_device_init(&ctx, &dev_config, &dev) != MA_SUCCESS) {
+    throw std::runtime_error("Failed to initialize audio device");
   }
 
-  printf("\n");
+  auto channels = dev.playback.channels;
 
-  printf("Capture Devices\n");
-  for (iDevice = 0; iDevice < captureDeviceCount; ++iDevice) {
-    printf("    %u: %s\n", iDevice, pCaptureDeviceInfos[iDevice].name);
+  if (channels != 2 && channels != 4) {
+    throw std::runtime_error(fmt::format(
+      "The selected output device has {} channel(s). Only 2 and 4 channels supported.",
+      channels
+    ));
   }
 
-  ma_context_uninit(&context);
+  auto ng_conf = ma_node_graph_config_init(channels);
+
+  if (ma_node_graph_init(&ng_conf, NULL, &graph) != MA_SUCCESS) {
+    throw std::runtime_error("Failed to initialize node graph.");
+  }
+
+  auto dec_conf = ma_decoder_config_init(
+    dev_config.playback.format, channels, dev_config.sampleRate
+  );
+
+  ma_decoder decoder;
+  ma_decoder_init_file(
+    "/home/wagnerflo/file_example_MP3_1MG.mp3",
+    &dec_conf,
+    &decoder
+  );
+
+  auto data_src_conf = ma_data_source_node_config_init(&decoder);
+
+  ma_data_source_node data_src_node;
+  ma_data_source_node_init(&graph, &data_src_conf, NULL, &data_src_node);
+
+  ma_node_attach_output_bus(&data_src_node, 0, ma_node_graph_get_endpoint(&graph), 0);
+
+  ma_device_start(&dev);
+
+  printf("Press Enter to quit...\n");
+  getchar();
+
+  // ma_node_graph node_graph;
+  // cursejay::channel_merge_node channel_merge(node_graph);
+
+}
+
+void cursejay::player::run() {
+  // std::cout << "PLAYER RUNNING" << std::endl;
+
+  // ma_sound sound;
+  // ma_sound_init_from_file(
+  //   &engine,
+  //   "/home/wagnerflo/file_example_MP3_1MG.mp3",
+  //   MA_SOUND_FLAG_STREAM | MA_SOUND_FLAG_NO_SPATIALIZATION,
+  //   NULL,
+  //   NULL,
+  //   &sound
+  // );
+
+  // ma_sound_start(&sound);
+  // printf("Press Enter to quit...\n");
+  // getchar();
+  // ma_sound_uninit(&sound);
+}
+
+std::list<ma_device_info> cursejay::player::device_infos() {
+  ma_device_info* infos;
+  ma_uint32 cnt;
+  if (ma_context_get_devices(&ctx, &infos, &cnt, NULL, NULL) != MA_SUCCESS) {
+    throw std::runtime_error("Failed to retrieve device information.");
+  }
+  return std::list<ma_device_info>(infos, infos + cnt);
 }

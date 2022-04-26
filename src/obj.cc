@@ -1,7 +1,6 @@
-#include "conf.hh"
-#include "db.hh"
+#include "obj.hh"
 
-cursejay::obj::obj(cursejay::conf& c, PolyM::Queue& q)
-  : conf(c), q(q) {
+cursejay::obj::obj(cursejay::conf& c, cursejay::broker& b)
+  : conf(c), broker(b) {
   /* empty */
 }

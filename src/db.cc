@@ -4,6 +4,6 @@
 #include <SQLiteCpp/VariadicBind.h>
 #include <taglib/fileref.h>
 
-void cursejay::db::start() {
+void cursejay::db::run() {
   TagLib::FileRef f("Latex Solar Beef.mp3");
 }

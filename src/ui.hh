@@ -7,7 +7,7 @@ namespace cursejay {
   class ui : public obj {
     public:
       using obj::obj;
-      void start();
+      void run();
   };
 }
 
