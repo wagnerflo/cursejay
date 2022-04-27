@@ -35,9 +35,9 @@ const std::size_t cmap4[] = {
   1  /* -> 3 */
 };
 
-channel_map_node::channel_map_node(ma_node_graph& graph, ma_uint32 c)
-  : out_channel_cnt(c), channel_map(cmap2) {
-  node_base.obj = this;
+void channel_map_node::init(ma_node_graph& graph, ma_uint32 c) {
+  out_channel_cnt = c;
+  channel_map = cmap2;
 
   ma_uint32 inputChannels[2] = { 1, 1 };
   ma_uint32 outputChannels[1] = { out_channel_cnt };
@@ -48,10 +48,6 @@ channel_map_node::channel_map_node(ma_node_graph& graph, ma_uint32 c)
   node_conf.pOutputChannels = outputChannels;
 
   init_node_base(graph, node_conf);
-}
-
-channel_map_node::~channel_map_node() {
-  ma_node_uninit(&node_base, NULL);
 }
 
 void channel_map_node::process(ma_node*, const float** in, ma_uint32* in_cnt,

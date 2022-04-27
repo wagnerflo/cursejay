@@ -1,12 +1,13 @@
 #ifndef CURSEJAY_CLASS_NODE_HH
 #define CURSEJAY_CLASS_NODE_HH
 
-#include <miniaudio.h>
+#include "attachable.hh"
+#include "miniaudio.hh"
 #include <stdexcept>
 
 namespace cursejay {
   template <typename T>
-  class class_node {
+  class class_node : public attachable {
     public:
       class adaptor {
         public:
@@ -18,14 +19,15 @@ namespace cursejay {
           }
       };
 
-      void attach_output_bus(ma_node* other, ma_uint32 out_idx, ma_uint32 inp_idx) {
-        if (ma_node_attach_output_bus(&node_base, out_idx, other, inp_idx) != MA_SUCCESS)
-          throw std::runtime_error("node output bus attach error");
+      class_node() : node_base { {}, static_cast<T*>(this) } { /* empty */ }
+      ~class_node() { /* empty */ }
+
+      ma_node* get_ma_node() {
+        return &node_base;
       }
 
-      void attach_input_bus(ma_node* other, ma_uint32 out_idx, ma_uint32 inp_idx) {
-        if (ma_node_attach_output_bus(other, out_idx, &node_base, inp_idx) != MA_SUCCESS)
-          throw std::runtime_error("node input bus attach error");
+      void uninit() {
+        ma_node_uninit(&node_base, NULL);
       }
 
     protected:
@@ -35,8 +37,10 @@ namespace cursejay {
       } node_base;
 
       void init_node_base(ma_node_graph& graph, ma_node_config& node_conf) {
-        if (ma_node_init(&graph, &node_conf, NULL, &node_base) != MA_SUCCESS)
-          throw std::runtime_error("node init error");
+        ma_throw(
+          ma_node_init(&graph, &node_conf, NULL, &node_base),
+          "Failed to initialize node."
+        );
       }
   };
 }

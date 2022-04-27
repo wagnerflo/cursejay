@@ -6,18 +6,19 @@ pkg_search_module(TAGLIB REQUIRED taglib)
 pkg_search_module(FMT REQUIRED fmt)
 
 add_executable ( cursejay
-  src/channel_map.cc
+  src/audio/channel_map.cc
+  src/audio/miniaudio.cc
   src/conf.cc
+  src/datasrc.cc
   src/db.cc
   src/main.cc
-  src/miniaudio.cc
   src/obj.cc
   src/player.cc
   src/ui.cc
 )
 
 set_source_files_properties(
-  src/miniaudio.cc
+  src/audio/miniaudio.cc
   PROPERTIES COMPILE_OPTIONS
   -Wno-conversion
 )

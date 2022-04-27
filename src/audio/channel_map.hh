@@ -2,7 +2,7 @@
 #define CURSEJAY_CHANNEL_MAP_HH
 
 #include "class_node.hh"
-#include <miniaudio.h>
+#include "miniaudio.hh"
 #include <span>
 
 namespace cursejay {
@@ -18,8 +18,7 @@ namespace cursejay {
       void process(ma_node*, const float**, ma_uint32*, float**, ma_uint32*);
 
     public:
-      channel_map_node(ma_node_graph&, ma_uint32);
-      ~channel_map_node();
+      void init(ma_node_graph&, ma_uint32);
   };
 }
 

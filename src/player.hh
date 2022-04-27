@@ -1,10 +1,11 @@
 #ifndef CURSEJAY_PLAYER_HH
 #define CURSEJAY_PLAYER_HH
 
+#include "audio/channel_map.hh"
+#include "audio/miniaudio.hh"
 #include "obj.hh"
 
 #include <list>
-#include <miniaudio.h>
 #include <string>
 
 namespace cursejay {
@@ -13,7 +14,10 @@ namespace cursejay {
 
     protected:
       ma_context ctx;
+      ma_device dev;
+      ma_resource_manager res;
       ma_node_graph graph;
+      channel_map_node channel_map;
 
       std::list<ma_device_info> device_infos();
       void data_callback(ma_device*, void*, const void*, ma_uint32);
@@ -24,7 +28,7 @@ namespace cursejay {
 
       std::list<std::string> list_devices();
 
-      void init(const std::string&);
+      void init(const std::string&, ma_uint32 = 48000);
       void run();
   };
 }
