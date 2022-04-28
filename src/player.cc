@@ -114,11 +114,21 @@ void player::init(const std::string& device_name, ma_uint32 sample_rate) {
   // next node maps two inputs to channels of the single endpoint output
   channel_map.init(graph, channel_cnt);
   channel_map.attach_output_bus(ma_node_graph_get_endpoint(&graph), 0, 0);
+
+  ma_device_start(&dev);
 }
 
 void player::run() {
-  ma_device_start(&dev);
   fmt::print("PLAYER RUNNING\n");
+
+  while (true) {
+    talker.recv();
+    // broker.recv();
+
+  }
+
+  
+  
 
   // play something
   datasrc ds(graph, res, "/home/wagner/Downloads/file_example_MP3_1MG.mp3");

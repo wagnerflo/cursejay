@@ -7,8 +7,8 @@
 namespace cursejay {
   class obj {
     protected:
-      cursejay::conf& conf;
-      cursejay::broker& broker;
+      class conf& conf;
+      class talker talker;
 
     public:
       obj(class conf&, class broker&);

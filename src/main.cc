@@ -22,8 +22,8 @@ int main() {
   }
 
   //player.init("Traktor Audio 2 MK2, USB Audio");
-  //player.init("sof-hda-dsp, ");
-  player.init("HDA Intel PCH, ALC671 Analog");
+  player.init("sof-hda-dsp, ");
+  //player.init("HDA Intel PCH, ALC671 Analog");
 
   // start threads
   std::array threads = {

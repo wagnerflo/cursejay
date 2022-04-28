@@ -1,6 +1,8 @@
 #include "obj.hh"
 
-cursejay::obj::obj(cursejay::conf& c, cursejay::broker& b)
-  : conf(c), broker(b) {
+using namespace cursejay;
+
+obj::obj(class conf& c, class broker& b)
+  : conf(c), talker(this, b) {
   /* empty */
 }
