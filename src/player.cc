@@ -122,7 +122,6 @@ void player::run() {
   fmt::print("PLAYER RUNNING\n");
 
   while (true) {
-    talker.recv();
     // broker.recv();
 
   }

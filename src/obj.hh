@@ -3,6 +3,9 @@
 
 #include "broker.hh"
 #include "conf.hh"
+#include "msg.hh"
+
+#include <iostream>
 
 namespace cursejay {
   class obj {
@@ -10,9 +13,18 @@ namespace cursejay {
       class conf& conf;
       class talker talker;
 
+      void _talk_forever(msgmap&&);
+
     public:
       obj(class conf&, class broker&);
-      virtual void run() = 0;
+
+      template <typename... Args> void talk_forever(Args... args) {
+        _talk_forever({ args... });
+      }
+
+      void talk_forever(msgmap&& map) {
+        _talk_forever(std::move(map));
+      }
   };
 }
 
