@@ -15,8 +15,8 @@ namespace cursejay {
   template <typename... Args>
   class msg {
     public:
-      using tuple_type = std::tuple<Args...>;
-      using data_msg_type = PolyM::DataMsg<tuple_type>;
+      using payload_type = std::tuple<Args...>;
+      using data_msg_type = PolyM::DataMsg<payload_type>;
       const int id = []() { return ++detail::msg_counter; }();
 
       template <typename Cls>
@@ -45,7 +45,7 @@ namespace cursejay {
       }
 
       auto make_data_msg(Args... args) const {
-        return data_msg_type(id, std::make_tuple(args...));
+        return data_msg_type(id, std::make_tuple(std::forward<Args>(args)...));
       }
   };
 

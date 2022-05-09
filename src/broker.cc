@@ -15,6 +15,10 @@ std::unique_ptr<PolyM::Msg> talker::recv() {
   return queue->get();
 }
 
+void talker::put(PolyM::Msg&& m) {
+  queue->put(std::move(m));
+}
+
 void broker::join(talker& t) {
   talkers.push_front(&t);
 }
