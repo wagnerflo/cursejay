@@ -7,8 +7,8 @@
 using namespace cursejay;
 
 obj::obj(class conf& c, class broker& b)
-  : conf(c), talker(std::move(b.join(this))) {
-  /* empty */
+  : conf(c), talker(b) {
+    /* empty */
 }
 
 void obj::_talk_forever(msgmap&& map) {

@@ -24,12 +24,6 @@ set_source_files_properties(
   -Wno-conversion
 )
 
-set_source_files_properties(
-  src/ui.cc
-  PROPERTIES COMPILE_OPTIONS
-  -Wno-conversion
-)
-
 target_compile_features( cursejay PRIVATE cxx_std_20 )
 target_compile_options( cursejay PRIVATE
   -Wall -Wextra -Wconversion
@@ -37,7 +31,6 @@ target_compile_options( cursejay PRIVATE
   ${TAGLIB_CFLAGS_OTHER}
 )
 target_include_directories ( cursejay PRIVATE
-  ext/cxxcurses/include
   ext/miniaudio
   ext/PolyM/include
   ${FMT_INCLUDE_DIRS}

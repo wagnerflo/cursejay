@@ -1,5 +1,5 @@
-#ifndef CURSEJAY_MSGID_HH
-#define CURSEJAY_MSGID_HH
+#ifndef CURSEJAY_MSG_HH
+#define CURSEJAY_MSG_HH
 
 #include <functional>
 #include <map>
@@ -15,6 +15,8 @@ namespace cursejay {
   template <typename... Args>
   class msg {
     public:
+      using tuple_type = std::tuple<Args...>;
+      using data_msg_type = PolyM::DataMsg<tuple_type>;
       const int id = []() { return ++detail::msg_counter; }();
 
       template <typename Cls>
@@ -28,7 +30,7 @@ namespace cursejay {
             auto operator>>(void(Cls::*memfn)(Args...)) {
               auto& objref = obj;
               return std::make_pair(id, [&objref,memfn](PolyM::Msg& msg) {
-                auto& dm = dynamic_cast<PolyM::DataMsg<std::tuple<Args...>>&>(msg);
+                auto& dm = dynamic_cast<data_msg_type&>(msg);
                 auto args = dm.getPayload();
                 std::apply(memfn, std::tuple_cat(std::make_tuple(&objref), args));
               });
@@ -41,15 +43,13 @@ namespace cursejay {
       auto operator>>(Cls* obj) const {
         return *this >> *obj;
       }
+
+      auto make_data_msg(Args... args) const {
+        return data_msg_type(id, std::make_tuple(args...));
+      }
   };
 
   typedef std::multimap<int,std::function<void(PolyM::Msg&)>> msgmap;
-
-  class MSG {
-    public:
-      inline static const  msg<>                 EXIT;
-      inline static const  msg<char>             UI_GETCH;
-  };
 }
 
 #endif

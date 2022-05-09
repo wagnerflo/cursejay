@@ -31,6 +31,7 @@ int main() {
   // start threads
   std::array threads = {
     std::thread(&ui::run, &ui),
+    std::thread(&ui::read_input, &ui),
     std::thread(&db::run, &db),
     std::thread(&player::run, &player)
   };

@@ -119,8 +119,6 @@ void player::init(const std::string& device_name, ma_uint32 sample_rate) {
 }
 
 void player::run() {
-  fmt::print("PLAYER RUNNING\n");
-
   while (true) {
     // broker.recv();
 
